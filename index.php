@@ -71,16 +71,28 @@ if (isset($_GET['hapus']) && is_numeric($_GET['hapus'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daftar Produk</title>
+    <title>FLOWSHOP</title>
+    <script src="js/jquery-3.7.1.js"></script>
+    <script src="js/script.js"></script>
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="./assets/style.css">
+    
 </head>
 <body class="<?php echo $currentTheme; ?>-theme">
     <header>
         <div class="headerLeft">
             <i class="toggleMenu bx bx-menu"></i>
             <a href="" class="title">FLOWSHOP</a>
+        </div>
+        <div class="search">
+            <div class="search-container">
+                <i class='bx bx-search'></i>
+                <input type="text" name="keyword" placeholder="Find your favorite flower products here..." 
+                    autocomplete="off" id="keyword">
+                <button type="button" id="btn-cari">Cari</button>
+            </div>
         </div>
         <div class="nav">
             <ul class="menu">
@@ -141,7 +153,7 @@ if (isset($_GET['hapus']) && is_numeric($_GET['hapus'])) {
         </div>
     </div>
 
-    <div class="container">
+    <div class="container" id="container">
     <h1>Products Set</h1>
     <div class="list-menu">
         <ul>
@@ -186,8 +198,6 @@ if (isset($_GET['hapus']) && is_numeric($_GET['hapus'])) {
             <?php endif; ?>
         </div>
     </div>
-
-
 
 </body>
 </html>

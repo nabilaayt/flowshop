@@ -54,9 +54,9 @@ header .title{
     font-weight: 500;
 }
 
-header .nav{
-    margin-left: auto;
-}
+/* header .nav{
+    margin-left: 10px;
+} */
 
 header a{
     text-decoration: none;
@@ -763,5 +763,142 @@ body.dark-theme .btn-primary:hover {
 }
 
 body.dark-theme .theme-toggle {
-    background-color: #bb86fc;
+    background-color: #C0C095;
+}
+
+.no-product{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: #FFFFFF;
+}
+
+
+/* SEARCH */
+.search {
+    flex: 1;
+    max-width: 450px;
+    margin: 0 50px;
+}
+
+.search-container {
+    position: relative;
+    width: 100%;
+}
+
+.search-container i.bx-search {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #636363;
+    font-size: 1.2rem;
+    z-index: 2;
+}
+
+.search-container input {
+    width: 100%;
+    padding: 12px 20px 12px 45px;
+    font-size: 1rem;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    outline: none;
+    transition: all 0.3s;
+    background-color: #fff;
+    position: relative;
+    z-index: 1;
+}
+
+.search-container input:focus {
+    border-color: #565553;
+    box-shadow: 0 0 0 2px rgba(86, 85, 83, 0.2);
+}
+
+#btn-cari {
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 35px;
+    padding: 0 15px;
+    border: none;
+    background-color: #565553;
+    color: #FFFFFF;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    z-index: 2;
+}
+
+#btn-cari:hover {
+    background-color: #3E3E3E;
+}
+
+/* Dark Theme Styles */
+body.dark-theme .search-container i.bx-search {
+    color: #bbbbbb;
+}
+
+body.dark-theme .search-container input {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-color: #444;
+    color: #ffffff;
+}
+
+body.dark-theme .search-container input:focus {
+    border-color: #C0C095;
+    box-shadow: 0 0 0 2px rgba(192, 192, 149, 0.2);
+}
+
+body.dark-theme #btn-cari {
+    background-color: #C0C095;
+    color: #1e1e1e;
+}
+
+body.dark-theme #btn-cari:hover {
+    background-color: #d0d0a5;
+}
+
+
+@media screen and (max-width: 992px) {
+    .search {
+        width: 30%;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .search {
+        width: 50%;
+        margin: 0 10px;
+    }
+    
+    header {
+        flex-wrap: wrap;
+        height: auto;
+        padding: 15px 5%;
+    }
+    
+    .headerLeft {
+        width: 100%;
+        justify-content: space-between;
+        margin-bottom: 10px;
+    }
+    
+    .search {
+        width: 100%;
+        order: 3;
+        margin: 10px 0;
+    }
+    
+    .nav {
+        width: 100%;
+        order: 2;
+    }
+    
+    header .menu {
+        justify-content: center;
+        padding: 0;
+    }
 }

@@ -160,6 +160,68 @@ class Product{
         }
         return false;
     }
+
+    public function searchProduct($keyword) {
+        $products = [];
+        
+        if(empty(trim($keyword))) {
+            return $this->getProducts();
+        }
+        
+        $searchKeyword = "%" . $this->conn->real_escape_string($keyword) . "%";
+        
+        $query = "SELECT * FROM produk WHERE 
+                  nama LIKE ? OR
+                  kategori LIKE ? OR
+                  harga LIKE ?";
+                  
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("sss", $searchKeyword, $searchKeyword, $searchKeyword);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+        while($row = $result->fetch_assoc()) {
+            $products[] = $row;
+        }
+        
+        return $products;
+    }
+}
+
+
+// Handle AJAX request
+if (isset($_GET['keyword'])) {
+    $productManager = new Product();
+    $searchResults = $productManager->searchProduct($_GET['keyword']);
+    
+    if(empty($searchResults)): ?>
+        <div class="no-product">
+            No products found matching your search
+        </div>
+    <?php else: ?>
+        <?php foreach ($searchResults as $product): ?>
+            <div class="product">
+                <img src="<?php echo htmlspecialchars($product['foto']); ?>" 
+                     alt="<?php echo htmlspecialchars($product['nama']); ?>"
+                     onerror="this.onerror=null; this.src='./assets/placeholder.jpg';">
+                <div class="product-content">
+                    <h2><?php echo htmlspecialchars($product['nama']); ?></h2>
+                    <p><?php echo htmlspecialchars($product['kategori']); ?></p>
+                    <p>Rp <?php echo number_format($product['harga'], 0, ',', '.'); ?></p>
+                </div>
+                <div class="product-actions">
+                    <a href="pages/edit.php?id=<?php echo $product['id']; ?>" 
+                       class="btn btn-warning">Edit</a>
+                    <a href="index.php?hapus=<?php echo $product['id']; ?>" 
+                       class="btn-danger" 
+                       onclick="return confirm('Apakah Anda yakin ingin menghapus produk ini?');">
+                        Delete
+                    </a>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    <?php endif;
+    exit;
 }
 
 
