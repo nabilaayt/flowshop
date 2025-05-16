@@ -4,11 +4,16 @@ session_start();
 require_once 'category.php';
 require_once 'product.php';
 require_once '../components/theme.php';
+require_once '../models/userModel.php';
 
 // Inisialisasi objek
+$userManager = new User();
 $categoryManager = new Category();
 $productManager = new Product();
-$currentTheme = getCurrentTheme();
+$currentTheme = $themeManager->getCurrentTheme();
+
+// Mengecek akses admin
+$userManager->checkAdminAccess();
 
 // Dapatkan ID produk dari URL
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;

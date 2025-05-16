@@ -1,7 +1,7 @@
 <?php
 
-// require_once '../config/database.php';
 require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../models/userModel.php';
 
 class Product{
     private $conn;
@@ -191,6 +191,15 @@ class Product{
 
 // Handle AJAX request
 if (isset($_GET['keyword'])) {
+
+    session_start();
+
+    $userRole = 'guest';
+    if (isset($_SESSION["id"])) {
+        $userManager = new User();
+        $userRole = $userManager->getUserRole($_SESSION["id"]) ?? 'guest';
+    }
+
     $productManager = new Product();
     $searchResults = $productManager->searchProduct($_GET['keyword']);
     
@@ -210,13 +219,19 @@ if (isset($_GET['keyword'])) {
                     <p>Rp <?php echo number_format($product['harga'], 0, ',', '.'); ?></p>
                 </div>
                 <div class="product-actions">
-                    <a href="pages/edit.php?id=<?php echo $product['id']; ?>" 
-                       class="btn btn-warning">Edit</a>
-                    <a href="index.php?hapus=<?php echo $product['id']; ?>" 
-                       class="btn-danger" 
-                       onclick="return confirm('Apakah Anda yakin ingin menghapus produk ini?');">
-                        Delete
-                    </a>
+                    <?php if ($userRole === 'admin'): ?>
+                        <a href="../pages/edit.php?id=<?php echo $product['id']; ?>" 
+                            class="btn btn-warning">Edit</a>
+                        <a href="../index.php?hapus=<?php echo $product['id']; ?>" 
+                            class="btn-danger" 
+                            onclick="return confirm('Apakah Anda yakin ingin menghapus produk ini?');">
+                            Delete
+                        </a>
+                    <?php elseif ($userRole === 'user'): ?>
+                        <button class="login_btn" onclick="buyProduct(<?php echo $product['id']; ?>)">
+                            Buy Product
+                        </button>
+                    <?php endif; ?>
                 </div>
             </div>
         <?php endforeach; ?>

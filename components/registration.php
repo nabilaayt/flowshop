@@ -7,7 +7,7 @@ require_once 'theme.php';
 $db = new Database();
 $conn = $db->getConnection();
 
-$currentTheme = getCurrentTheme();
+$currentTheme = $themeManager->getCurrentTheme();
 
 // Jika sudah login, redirect ke index.php
 if(!empty($_SESSION["id"])){
@@ -21,6 +21,9 @@ if(isset($_POST["submit"])){
     $password = $_POST["password"];
     $confirmPassword = $_POST["confirmpassword"];
 
+    // Default role "user"
+    $role = 'user';
+
     $stmt = $conn->prepare("SELECT * FROM user WHERE email = ?");
     $stmt->bind_param("s", $email);
     $stmt->execute();
@@ -33,8 +36,8 @@ if(isset($_POST["submit"])){
             // Hash password
             $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
-            $stmt = $conn->prepare("INSERT INTO user (name, email, password) VALUES (?, ?, ?)");
-            $stmt->bind_param("sss", $name, $email, $hashedPassword);
+            $stmt = $conn->prepare("INSERT INTO user (name, email, password, role) VALUES (?, ?, ?, ?)");
+            $stmt->bind_param("ssss", $name, $email, $hashedPassword, $role);
 
             if($stmt->execute()){
                 // echo "<script> alert('Registration Successful'); </script>";

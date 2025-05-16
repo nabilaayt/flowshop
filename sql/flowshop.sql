@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 06, 2025 at 08:32 PM
+-- Generation Time: May 12, 2025 at 07:18 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -69,15 +69,18 @@ CREATE TABLE `user` (
   `id` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
-  `password` varchar(255) NOT NULL
+  `password` varchar(255) NOT NULL,
+  `role` enum('user','admin') NOT NULL DEFAULT 'user'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `user`
 --
 
-INSERT INTO `user` (`id`, `name`, `email`, `password`) VALUES
-(10, 'nabilaayu', 'nabilaayuu@gmail.com', '$2y$10$QWeUQ6u8KAsBjQj8vSucdujBN0ukuAi.w9ENsIaC2eEhVx10o76A6');
+INSERT INTO `user` (`id`, `name`, `email`, `password`, `role`) VALUES
+(10, 'nabilaayu', 'nabilaayuu@gmail.com', '$2y$10$QWeUQ6u8KAsBjQj8vSucdujBN0ukuAi.w9ENsIaC2eEhVx10o76A6', 'user'),
+(11, 'Admin', 'admin@flowshop.com', '$2y$10$hxzYFFCUOHZWRjDRExgciOTNSUqMaa6M6SIqnQUTkePAEqu4md/G2', 'admin'),
+(12, 'nabila', 'nabila@gmail.com', '$2y$10$jLOOhxIaNklf.ULQF5FQC.k6sxa42LLbIMwkpMt5LRn9JOkAm0YV2', 'user');
 
 --
 -- Indexes for dumped tables
@@ -109,7 +112,7 @@ ALTER TABLE `produk`
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

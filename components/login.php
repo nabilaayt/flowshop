@@ -7,9 +7,9 @@ require_once 'theme.php';
 $db = new Database();
 $conn = $db->getConnection();
 
-$currentTheme = getCurrentTheme();
+$currentTheme = $themeManager->getCurrentTheme();
 
-// Jika use sudah login, redirect ke index.php
+// Jika user sudah login, redirect ke index.php
 if(!empty($_SESSION["id"])){
     header("Location: ../index.php");
     exit();
@@ -29,7 +29,13 @@ if(isset($_POST["submit"])){
         if(password_verify($password, $row["password"])){
             $_SESSION["login"] = true;
             $_SESSION["id"] = $row["id"];
-            header("Location: ../index.php");
+
+            // Redirect berdasarkan role user
+            if($row["role"] == 'admin'){
+                header("Location: ../index.php");
+            } else {
+                header("Location: ../index.php");
+            }
             exit();
         } else {
             echo "<script> alert('Wrong Password'); </script>";

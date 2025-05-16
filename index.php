@@ -1,14 +1,14 @@
 <?php
-
 session_start();
 require_once 'pages/category.php';
 require_once 'pages/product.php';
 require_once 'components/theme.php';
+require_once 'models/userModel.php';
 
 $db = new Database();
 $conn = $db->getConnection();
 
-$currentTheme = getCurrentTheme();
+$currentTheme = $themeManager->getCurrentTheme();
 
 // Periksa apakah user sudah login/belum
 if(empty($_SESSION["id"])){
@@ -24,11 +24,12 @@ $stmt->execute();
 $result = $stmt->get_result();
 $row = $result->fetch_assoc();
 
-
 // Inisialisasi objek
+$userManager = new User();
 $categoryManager = new Category();
 $productManager = new Product();
 
+$userRole = $userManager->getUserRole($id);
 $availableCategories = $categoryManager->getAvailableCategories();
 $activeCategory = $categoryManager->getActiveCategory();
 
@@ -40,8 +41,8 @@ if ($activeCategory === 'all') {
     $filteredProducts = $productManager->getProducts($categoryName);
 }
 
-// Penambahan Produk Baru
-if (isset($_POST['tambah_produk'])) {
+// Penambahan Produk Baru (khusus admin)
+if ($userRole === 'admin' && isset($_POST['tambah_produk'])) {
     $nama = htmlspecialchars($_POST['nama']);
     $kategori = htmlspecialchars($_POST['kategori']);
     $harga = (int)$_POST['harga'];
@@ -53,8 +54,8 @@ if (isset($_POST['tambah_produk'])) {
     exit;
 }
 
-// Proses penghapusan produk
-if (isset($_GET['hapus']) && is_numeric($_GET['hapus'])) {
+// Proses penghapusan produk (khusus admin)
+if ($userRole === 'admin' && isset($_GET['hapus']) && is_numeric($_GET['hapus'])) {
     $id = (int)$_GET['hapus'];
     
     $productManager->deleteProduct($id);
@@ -64,6 +65,28 @@ if (isset($_GET['hapus']) && is_numeric($_GET['hapus'])) {
     exit;
 }
 
+// Fungsi menampilkan notifikasi
+function displayNotification() {
+    if (isset($_SESSION['notification'])) {
+        $notification = $_SESSION['notification'];
+        $type = $notification['type'];
+        $message = $notification['message'];
+
+        echo "
+            <div class='notification {$type}'>
+                <div class='notification-content'>
+                    <i class='bx bx-check-circle'></i>
+                <div class='notification-text'>
+                    <h3>" . ($type == 'success' ? 'Success!' : 'Pemberitahuan') . "</h3>
+                    <p>{$message}</p>
+                </div>
+                <span class='close-notification' onclick='this.parentElement.parentElement.style.display=\"none\";'><i class='bx bx-x'></i></span>
+                </div>
+            </div>";
+
+        unset($_SESSION['notification']);
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -81,6 +104,8 @@ if (isset($_GET['hapus']) && is_numeric($_GET['hapus'])) {
     
 </head>
 <body class="<?php echo $currentTheme; ?>-theme">
+    <?php displayNotification(); ?>
+
     <header>
         <div class="headerLeft">
             <i class="toggleMenu bx bx-menu"></i>
@@ -97,7 +122,9 @@ if (isset($_GET['hapus']) && is_numeric($_GET['hapus'])) {
         <div class="nav">
             <ul class="menu">
                 <li class="lnk"><a href="#main">Home</a></li>
-                <li class="lnk"><a href="#add">Add Product</a></li>
+                <?php if ($userRole === 'admin'): ?>
+                    <li class="lnk"><a href="#add">Add Product</a></li>
+                <?php endif; ?>
                 <li class="lnk"><a href="#product">Product</a></li>
                 <li class= "logout"><a href="components/logout.php">Log Out</a></li>
                 <li>
@@ -110,15 +137,16 @@ if (isset($_GET['hapus']) && is_numeric($_GET['hapus'])) {
     </header>
 
     <main id="main" class="hero-section">
-        <div class="hero-content">
+        <div class="hero-content hero-content-alt">
             <h1>FLOWSHOP</h1>
-            <p>Welcome to FLOWSHOP, where every bouquet is crafted with love and beauty. Find the perfect arrangement for your special moments and surprise your loved ones!</p>
+            <p class="text-hero">Welcome to FLOWSHOP, where every bouquet is crafted with love and beauty. Find the perfect arrangement for your special moments and surprise your loved ones!</p>
             <a href="#product" class="btn-main">See More</a>
         </div>
     </main>
 
-    <!-- Form tambah produk -->
-    <div class="add-product" id= "add">
+    <!-- Form tambah produk (khusus admin) -->
+    <?php if ($userRole === 'admin'): ?>
+    <div class="add-product" id="add">
         <h1>Product Management</h1>
         <p>Manage and showcase your beautiful floral arrangements effortlessly. Add new products, set categories, and update pricing to keep your shop fresh and inviting!</p>
         <div class="form-container">
@@ -152,6 +180,7 @@ if (isset($_GET['hapus']) && is_numeric($_GET['hapus'])) {
             </form>
         </div>
     </div>
+    <?php endif; ?>
 
     <div class="container" id="container">
     <h1>Products Set</h1>
@@ -185,13 +214,22 @@ if (isset($_GET['hapus']) && is_numeric($_GET['hapus'])) {
                             <p>Rp <?php echo number_format($product['harga'], 0, ',', '.'); ?></p>
                         </div>
                         <div class="product-actions">
-                            <a href="pages/edit.php?id=<?php echo $product['id']; ?>" 
-                               class="btn btn-warning">Edit</a>
-                            <a href="?hapus=<?php echo $product['id']; ?><?php echo isset($_GET['kategori']) ? '&kategori=' . $_GET['kategori'] : ''; ?>" 
-                               class="btn-danger" 
-                               onclick="return confirm('Apakah Anda yakin ingin menghapus produk ini?');">
-                                Delete
-                            </a>
+                            <?php if ($userRole === 'admin'): ?>
+                                <a href="pages/edit.php?id=<?php echo $product['id']; ?>" 
+                                   class="btn btn-warning">Edit</a>
+                                <a href="?hapus=<?php echo $product['id']; ?><?php echo isset($_GET['kategori']) ? '&kategori=' . $_GET['kategori'] : ''; ?>" 
+                                   class="btn-danger" 
+                                   onclick="return confirm('Apakah Anda yakin ingin menghapus produk ini?');">
+                                    Delete
+                                </a>
+                            <?php elseif ($userRole === 'user'): ?>
+                                <!-- <button class="login_btn" onclick="buyProduct(<?php echo $product['id']; ?>)">
+                                    Buy Product
+                                </button> -->
+                                <a href="pages/buy.php?id=<?php echo $product['id']; ?>" class="login_btn">
+                                    Buy Product
+                                </a>
+                            <?php endif; ?>
                         </div>
                     </div>
                 <?php endforeach ?>
